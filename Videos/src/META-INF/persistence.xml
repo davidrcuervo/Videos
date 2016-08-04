@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<persistence version="2.1" xmlns="http://xmlns.jcp.org/xml/ns/persistence" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/persistence http://xmlns.jcp.org/xml/ns/persistence/persistence_2_1.xsd">
+	<persistence-unit name="Videos">
+		<class>com.laetienda.entities.App</class>
+		<class>com.laetienda.entities.Group</class>
+		<class>com.laetienda.entities.Language</class>
+		<class>com.laetienda.entities.Log</class>
+		<class>com.laetienda.entities.Setting</class>
+		<class>com.laetienda.entities.Text</class>
+		<class>com.laetienda.entities.TextIndex</class>
+		<class>com.laetienda.entities.TextReference</class>
+		<class>com.laetienda.entities.User</class>
+		<class>com.laetienda.entities.UserGroup</class>
+		<class>com.laetienda.entities.Value</class>
+		<class>com.laetienda.entities.Variable</class>
+		<properties>
+			<property name="javax.persistence.jdbc.url" value="jdbc:postgresql://localhost:5432/dev_videos"/>
+			<property name="javax.persistence.jdbc.user" value="videos"/>
+			<property name="javax.persistence.jdbc.password" value="www.myself.com"/>
+			<property name="javax.persistence.jdbc.driver" value="org.postgresql.Driver"/>
+		</properties>
+	</persistence-unit>
+</persistence>
