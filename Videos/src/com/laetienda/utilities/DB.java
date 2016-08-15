@@ -116,19 +116,21 @@ public class DB {
     }
     
     public String getSetting(String setting){
-    	
+    	log.info("finding setting. $setting: " + setting);
     	String result = settings.get(setting);
     	
     	if(result == null){
+    		EntityManager em = getEm();
     		try{
-    			EntityManager em = getEm();
         		Setting temp = em.createNamedQuery("Setting.findByVariable", Setting.class).setParameter("variable", setting).getSingleResult();
         		result = temp.getSetting().getValue();
+        		log.debug("Setting has been found in the database. $setting: " + setting + " -> $value: " + result);
         		settings.put(setting, result);
-        		closeEm(em);
     		}catch(Exception ex){
     			log.notice("Setting does not exist. $setting: " + setting);
     			log.exception(ex);
+    		}finally{
+    			closeEm(em);
     		}
     	}
     	return result;

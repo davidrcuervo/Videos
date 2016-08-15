@@ -4,6 +4,9 @@ import java.io.Serializable;
 import javax.persistence.*;
 import java.util.Date;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import com.laetienda.utilities.Mail;
 
 @Entity
 @Table(name="users")
@@ -58,6 +61,9 @@ public class User extends Father implements Serializable {
 	@OneToOne
 	@JoinColumn(name="\"status\"")
 	private Value status;
+	
+	@Transient
+	private Mail mail;
 
 	public User() {
 		super(null);
@@ -79,8 +85,22 @@ public class User extends Father implements Serializable {
 		return this.password;
 	}
 
-	public void setPassword(String password) {
-		this.password = password;
+	public void setPassword(String password, String password2) {
+		
+		if(password != null && !password.isEmpty()){
+			this.password = org.apache.catalina.realm.RealmBase.Digest(password, "SHA-256", "utf-8");
+			
+			if(this.password.length() > 254){
+				addError("password", "password_error_long");
+			}
+			
+			if(password.equals(password2)){
+				addError("password", "password_error_different");
+			}
+			
+		}else{
+			addError("password", "password_error_empty");
+		}
 	}
 
 	public String getUsername() {
@@ -88,11 +108,41 @@ public class User extends Father implements Serializable {
 	}
 
 	public void setUsername(String username) {
+		
+		if(username != null && !username.isEmpty()){
+			
+			if(username.length() > 254){
+				addError("username", "username_error_long");
+			}
+			
+			Pattern p = Pattern.compile("^[_A-Za-z0-9-\\+]+(\\.[_A-Za-z0-9-]+)*@[A-Za-z0-9-]+(\\.[A-Za-z0-9]+)*(\\.[A-Za-z]{2,})$");
+			Matcher m = p.matcher(username);
+			
+			if(!m.matches()){
+				addError("username", "username_error_invalid");
+			}
+			
+			if(getApp().getUser(username) != null){
+				addError("username", "username_error_exist");
+			}
+			
+		}else{
+			addError("username", "username_error_empty");
+		}
+		
 		this.username = username;
 	}
 
 	public App getApp() {
 		return this.app;
+	}
+	
+	public void setApp(App app){
+		this.app = app;
+		
+		if(!getApp().getUsers().contains(this)){
+			getApp().addUser(this);
+		}
 	}
 
 	public List<UserGroup> getUserGroups() {
@@ -137,12 +187,80 @@ public class User extends Father implements Serializable {
 		return this.status;
 	}
 	
+	public void setStatus(String status){
+		
+		if(getErrors().size() <= 0){
+			List<Value> values = getApp().getValues("user_status");
+			
+			if(!(values == null)){
+				
+				boolean flag = false;
+				for(Value temp : values){
+					if(temp.getValue().equals(status)){
+						
+						flag = true;
+						
+						switch (status){
+						
+						case "registered":
+							if(mail != null && send()){
+								setStatus(temp);
+							}else{
+								addError("user", "user_error_internal");
+								log.critical("It was not possible to send email");
+							}
+							break;
+						
+						default:
+							addError("user", "user_error_internal");
+							log.critical("status does not exist. $status: " + status);
+							break;
+						}
+						
+						break;
+					}
+				}
+				
+				if(!flag){
+					log.critical("User status doesn't exist in the database. $user_status: " + status);
+					addError("user", "user_error_internal");
+				}
+				
+			}else{
+				log.critical("Variable does not exist in the database. $variable: user_status");
+				addError("user", "user_error_internal");
+			}
+		}
+	}
+	
+	private boolean send(){
+		
+		//TODO find a way to get content and subject		
+		
+		/*
+		mail.setContent(content);
+		mail.setSubject(subject);
+		
+		return mail.send();
+		*/
+		return true;
+	}
+	
 	public void setStatus(Value status){
 		this.status = status;
 	}
 	
 	public List<Log> getLogs(){
 		return this.logs;
+	}
+	
+	public void setMail(Mail mail){
+		
+		if(mail != null){
+			this.mail = mail;
+		}else{
+			addError("user", "user_error_internal");
+		}
 	}
 	
 	public Log addLog(Log log){

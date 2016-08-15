@@ -2,19 +2,21 @@ package com.laetienda.utilities;
 
 import javax.persistence.EntityManager;
 
-import com.laetienda.utilities.DB;
+//import com.laetienda.utilities.DB;
 import com.laetienda.utilities.Logger;
 
 public class DbTransaction {
 	
 	private EntityManager em;
 	private Logger log;
-	private DB db;
+	//private DB db;
 	
-	public DbTransaction(DB db, Logger log){
-		this.db = db;
+	public DbTransaction(EntityManager em, Logger log){
+		//this.db = db;
+		this.em = em;
+		
 		try{
-			em = db.getEm();
+			//em = db.getEm();
 			em.getTransaction().begin();
 			this.log = log;
 		}catch(Exception ex){
@@ -46,18 +48,19 @@ public class DbTransaction {
 			log.notice("Exception caught while commiting in the database");
 			log.exception(ex);
 		}finally{
-			close();
+			em.clear();
+			em.close();
 		}
 		return result;
 	}
 	
 	public void close(){
 		log.info("Closing entity manager");
-		db.closeEm(em);
+		em.clear();
+		em.close();
 	}
 	
 	public EntityManager getEm(){
 		return this.em;
 	}
-	
 }

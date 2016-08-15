@@ -1,5 +1,7 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 
+${page.addStyle('styles/login.css') }
+
 <jsp:include page="/WEB-INF/view/web/forms/login.jsp"></jsp:include>
 <jsp:include page="/WEB-INF/view/web/forms/password.jsp"></jsp:include>
 <jsp:include page="/WEB-INF/view/web/forms/signup.jsp"></jsp:include>
@@ -18,9 +20,9 @@
 		
 		<!-- tab panes -->
 		<div class="tab-content">
-			<div role="tabpanel" class="tab-pane" id="password">${password_form}</div>
-			<div role="tabpanel" class="tab-pane active" id="signup">${signup_form}</div>
-			<div role="tabpanel" class="tab-pane" id="login">${login_form}</div>
+			<div role="tabpanel" class="tab-pane" id="password"><div class="form_frame">${password_form}</div></div>
+			<div role="tabpanel" class="tab-pane active" id="signup"><div class="from_frame">${signup_form}</div></div>
+			<div role="tabpanel" class="tab-pane" id="login"><div class="form_frame">${login_form}</div></div>
 		</div>
 	</div>
 </c:set>

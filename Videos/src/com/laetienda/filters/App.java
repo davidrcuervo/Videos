@@ -16,6 +16,7 @@ import com.laetienda.utilities.DB;
 import com.laetienda.utilities.Logger;
 import com.laetienda.utilities.Lang;
 import com.laetienda.utilities.Auth;
+import com.laetienda.beans.Page;
 
 public class App implements Filter {
 	
@@ -25,6 +26,8 @@ public class App implements Filter {
 	private String[] pathParts;
 	private Auth auth;
 	private Lang lang;
+	private Page page;
+	
 	
     public App() {
         // TODO Auto-generated constructor stub
@@ -49,7 +52,10 @@ public class App implements Filter {
 		setLang(httpReq);
 		setAuth(httpReq, httpResp);
 		
+		page = new Page(httpReq, log); 
+		
 		httpReq.setAttribute("pathParts", pathParts);
+		httpReq.setAttribute("page", page);
 
 		// pass the request along the filter chain
 		chain.doFilter(request, response);
@@ -109,13 +115,16 @@ public class App implements Filter {
 		 ======================================================================*/
 		
 		// /assets/* 
-		if(		(pathParts.length == 3 && pathParts[1].equals("assets"))
+		if(		(pathParts.length >= 3 && pathParts[1].equals("assets"))
 				
 		// /images/*
 			||	(pathParts.length == 3 && pathParts[1].equals("image"))
 			
 		//	/login
 			||  (pathParts.length == 2 && pathParts[1].equals("login") )
+			
+		// /thankyou/*
+			|| 	(pathParts.length == 3 && pathParts[1].equals("thankyou"))
 				){
 			
 			log.debug("Serving content that does not require authentication");

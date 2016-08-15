@@ -12,7 +12,7 @@
 			<c:if test="${user.errors['username'] != null}">
 				<div class="text-danger text-center">
 					<c:forEach var="error" items="${user.errors['username'] }">
-						<small>${error}</small><br />
+						<small>${lang.out(error)}</small><br />
 					</c:forEach>
 				</div>
 			</c:if>
@@ -29,7 +29,7 @@
 			<c:if test="${user.errors['password'] != null}">
 				<div class="text-danger text-center">
 					<c:forEach var="error" items="${user.errors['password'] }">
-						<small>${error}</small><br />
+						<small>${lang.out(error)}</small><br />
 					</c:forEach>
 				</div>
 			</c:if>
@@ -49,7 +49,7 @@
 		<c:if test="${user.errors['user'] != null}">
 			<div class="text-danger text-center">
 				<c:forEach var="error" items="${user.errors['user'] }">
-					<small>${error}</small><br />
+					<small>${lang.out(error)}</small><br />
 				</c:forEach>
 			</div>
 		</c:if>

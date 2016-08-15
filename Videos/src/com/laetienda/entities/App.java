@@ -85,7 +85,6 @@ public class App extends Father implements Serializable {
 		return this.modified;
 	}
 
-
 	public String getName() {
 		return this.name;
 	}
@@ -207,6 +206,14 @@ public class App extends Father implements Serializable {
 		return setting;
 	}
 	
+	public void addUser(User user){
+		if(!getUsers().contains(user)){
+			getUsers().add(user);
+		}
+		
+		user.setApp(this);
+	}
+	
 	public User getUser(String username){
 		User result = null;
 		
@@ -217,25 +224,10 @@ public class App extends Father implements Serializable {
 		User temp = this.userByUsername.get(username);
 		if(temp == null){
 			
-			for(int c=0; c < getUsers().size(); c++){
-				
-				if(getUsers().get(c).getUsername().equals(username)){
-					if(getUsers().get(c).getApp().equals(this)){
-						System.out.println("objects are the same");
-					}else{
-						System.out.println("objects are NOT the same");
-					}
-					break;
-				}
-			}
-			
 			for(User temp2 : getUsers()){
 				if(temp2.getUsername().equals(username)){
 					result = temp2;
 					this.userByUsername.put(result.getUsername(), result);
-					
-					
-					
 					break;
 				}
 			}
@@ -300,6 +292,20 @@ public class App extends Father implements Serializable {
 
 	public List<Variable> getVariables() {
 		return this.variables;
+	}
+	
+	public List<Value> getValues(String variable){
+		
+		List<Value> values = null;
+		
+		for(Variable temp : getVariables()){
+			if(temp.getName().equals(variable)){
+				values = temp.getValues();
+				break;
+			}
+		}
+		
+		return values;
 	}
 
 	public void setVariables(List<Variable> variables) {

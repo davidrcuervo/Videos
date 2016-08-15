@@ -22,6 +22,14 @@
     <url-pattern>/logout</url-pattern>
     <url-pattern>/password</url-pattern>
   </servlet-mapping>
+    <servlet>
+    <servlet-name>thankyou</servlet-name>
+    <servlet-class>com.laetienda.servlets.Thankyou</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>thankyou</servlet-name>
+    <url-pattern>/thankyou/*</url-pattern>
+  </servlet-mapping>
   <context-param>
     <param-name>appName</param-name>
     <param-value>Videos</param-value>

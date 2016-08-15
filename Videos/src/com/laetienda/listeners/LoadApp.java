@@ -8,11 +8,13 @@ import javax.servlet.ServletContextListener;
 
 import com.laetienda.utilities.DB;
 import com.laetienda.utilities.Logger;
+import com.laetienda.utilities.Mailer;
 
 public class LoadApp implements ServletContextListener {
 	
 	private DB db;
 	private Logger log;
+	private Mailer mailer;
 
     public LoadApp() {
         // TODO Auto-generated constructor stub
@@ -29,6 +31,7 @@ public class LoadApp implements ServletContextListener {
     	
     	intializeDB(sc);
     	initializeLogger(sc);
+    	initializeMailer(sc);
     }
     
     private void intializeDB(ServletContext sc){
@@ -55,5 +58,17 @@ public class LoadApp implements ServletContextListener {
     	this.log = new Logger(db.getUserByUsername("Logger"), db.getEm());
     	log.info("Logger has been initialized");
     	log.info("The application has initialized succesfully");
+    }
+    
+    private void initializeMailer(ServletContext sc){
+    	
+    	String server = db.getSetting("email_server_address");
+    	String portTemp = db.getSetting("email_server_port");
+    	int port = Integer.parseInt(portTemp);
+    	String username = db.getSetting("email_server_username");
+    	String password = db.getSetting("email_server_password");
+    	
+    	mailer = new Mailer(server, port, username, password, log);
+    	sc.setAttribute("mailer", mailer);
     }
 }
