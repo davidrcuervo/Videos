@@ -37,4 +37,5 @@ public class Mailer {
 		
 		return mail;
 	}
+	
 }

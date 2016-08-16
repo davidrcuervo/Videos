@@ -4,8 +4,14 @@ import java.io.CharArrayWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
 
-public class CharArrayWriterResponse {
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpServletResponseWrapper;
+
+public class CharArrayWriterResponse extends HttpServletResponseWrapper{
 	
 	private final CharArrayWriter charArray = new CharArrayWriter();
- 
+	
+	public CharArrayWriterResponse(HttpServletResponse response){
+		super(response);
+	}
 }
