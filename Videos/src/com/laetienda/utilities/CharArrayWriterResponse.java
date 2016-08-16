@@ -14,4 +14,10 @@ public class CharArrayWriterResponse extends HttpServletResponseWrapper{
 	public CharArrayWriterResponse(HttpServletResponse response){
 		super(response);
 	}
+	
+	@Override
+	public PrintWriter getWriter() throws IOException{
+		return new PrintWriter(charArray);
+	}
+	
 }
