@@ -2,10 +2,13 @@ package com.laetienda.utilities;
 
 import java.util.HashMap;
 
+import javax.servlet.http.Cookie;
 import javax.persistence.EntityManager;
+import com.laetienda.entities.Variable;
 import com.laetienda.utilities.Logger;
 import com.laetienda.entities.Language;
 import com.laetienda.entities.User;
+import com.laetienda.entities.Value;
 
 /**
  * @author myself
@@ -17,7 +20,8 @@ public class Lang {
 	private EntityManager em;
 	private User user;
 	private Logger log;
-	private String tempLang;
+	private String headerLanguage;
+	private Cookie cookie;
 	
 	/**
 	 * @param em	entity manager that will be encharged to pull data from the database.
@@ -29,8 +33,7 @@ public class Lang {
 		this.log = log;
 		this.em = em;
 		this.user = user;
-		tempLang = "en";
-		
+				
 		langs = new HashMap<String, Language>();
 	}
 	
@@ -49,8 +52,19 @@ public class Lang {
 	 */
 	public String getLang(){
 		
-		String result = user.getLanguage().getValue();
-		return result.equals("none") ? tempLang : result;
+		String result; 
+		
+		if(!user.getLanguage().getValue().equals("none")){
+			result = user.getLanguage().getValue();
+		}else if(getCookie().getValue() != null && !getCookie().getValue().isEmpty()){
+			result = getCookie().getValue();
+		}else if(getHeaderLanguage() != null && !getHeaderLanguage().isEmpty()){
+			result = getHeaderLanguage();
+		}else{
+			result = "en";
+		}
+		
+		return result;
 	}
 	
 	/**
@@ -60,13 +74,32 @@ public class Lang {
 		this.user = user;
 	}
 	
-	/**
-	 * @param tempLang "en" for english.<br />
-	 * "es" for spanish.<br />
-	 * "fr" for french
-	 */
-	public void setTempLang(String tempLang){
-		this.tempLang = tempLang;
+	
+	public void setCookie(Cookie cookie){
+		
+		if(cookie == null){
+			this.cookie = new Cookie("lang", null);
+		}else{
+			this.cookie = cookie;
+		}
+	}
+	
+	public Cookie getCookie(){
+		return cookie;
+	}
+	
+	public void setHeaderLanguage(String headerLanguage){
+		
+		if(headerLanguage == null || headerLanguage.isEmpty()){
+			
+		}else{
+			//TODO find the langugage based on the header
+			this.headerLanguage = headerLanguage;
+		}
+	}
+	
+	private String getHeaderLanguage(){
+		return headerLanguage;
 	}
 	
 	/**
@@ -82,10 +115,12 @@ public class Lang {
 			try{
 				lang = em.createNamedQuery("Language.findByIdentifier", Language.class).setParameter("identifier", identifier).getSingleResult();
 				langs.put(identifier, lang);
-				em.clear();
+				
 			}catch(Exception ex){
 				log.error("The requested text does not exist in the language table. $identifier: " + identifier);
 				log.exception(ex);
+			}finally{
+				em.clear();
 			}
 		}
 		
@@ -110,11 +145,34 @@ public class Lang {
 					break;
 			}
 			
-			
 		}else{
 			result = "<span style='color: red;'>" + identifier + "</span>";
 		}
 		
 		return result;
+	}
+	
+	public void setLang(String lang){
+		
+		try{
+			Variable languages = getEm().createNamedQuery("Variable.findByName", Variable.class).setParameter("name", "languagues").getSingleResult();
+			
+			for(Value temp : languages.getValues()){
+				
+				if(temp.getValue() != null && temp.getValue().equals(lang)){
+					getCookie().setValue(temp.getValue());
+					break;
+				}
+			}
+			
+		}catch (IllegalArgumentException ex){
+			log.critical("error while finding languages");
+			log.exception(ex);
+		}catch(Exception ex){
+			log.error("error while finding languages");
+			log.exception(ex);
+		}finally{
+			getEm().clear();
+		}
 	}
 }

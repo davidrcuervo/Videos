@@ -6,7 +6,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import com.laetienda.utilities.Mail;
 
 @Entity
 @Table(name="users")
@@ -62,9 +61,6 @@ public class User extends Father implements Serializable {
 	@JoinColumn(name="\"status\"")
 	private Value status;
 	
-	@Transient
-	private Mail mail;
-
 	public User() {
 		super(null);
 	}
@@ -94,13 +90,24 @@ public class User extends Father implements Serializable {
 				addError("password", "password_error_long");
 			}
 			
-			if(password.equals(password2)){
+			if(!password.equals(password2)){
 				addError("password", "password_error_different");
 			}
 			
 		}else{
 			addError("password", "password_error_empty");
 		}
+	}
+	
+	public boolean validatePassword(String password){
+		String temp = org.apache.catalina.realm.RealmBase.Digest(password, "SHA-256", "utf-8");
+		boolean result = false;
+		
+		if(getPassword().equals(temp)){
+			result = true;
+		}
+		
+		return result;
 	}
 
 	public String getUsername() {
@@ -126,11 +133,11 @@ public class User extends Father implements Serializable {
 				addError("username", "username_error_exist");
 			}
 			
+			this.username = username;
+			
 		}else{
 			addError("username", "username_error_empty");
 		}
-		
-		this.username = username;
 	}
 
 	public App getApp() {
@@ -183,6 +190,37 @@ public class User extends Father implements Serializable {
 		this.language = language;
 	}
 	
+	public void setLanguage(String language){
+		boolean flag = false;
+		
+		for(Value temp : getApp().getValues("languagues")){
+			if(temp.getValue() != null && temp.getValue().equals(language)){
+				setLanguage(temp);
+				flag = true;
+				break;
+			}
+		}
+		
+		if(!flag){
+			addError("language", "user_language_not_exist");
+		}
+	}
+	
+	public String isValid(){
+		String result = new String();
+		
+		if(!getStatus().getValue().equals("valid")){
+			
+			if(getStatus().getValue().equals("registered")){
+				result = "user_status_password_not_comfirmed";
+			}else if(getStatus().getValue().equals("registered")){
+				result = "user_status_password_disabled";
+			}
+		}
+		
+		return result;
+	}
+	
 	public Value getStatus(){
 		return this.status;
 	}
@@ -202,25 +240,18 @@ public class User extends Father implements Serializable {
 						
 						switch (status){
 						
-						case "registered":
-							if(mail != null && send()){
+							case "registered":
 								setStatus(temp);
-							}else{
+								break;
+							
+							default:
 								addError("user", "user_error_internal");
-								log.critical("It was not possible to send email");
-							}
-							break;
-						
-						default:
-							addError("user", "user_error_internal");
-							log.critical("status does not exist. $status: " + status);
-							break;
-						}
-						
-						break;
+								log.critical("status does not exist. $status: " + status);
+								break;
+						}	
 					}
 				}
-				
+			
 				if(!flag){
 					log.critical("User status doesn't exist in the database. $user_status: " + status);
 					addError("user", "user_error_internal");
@@ -233,34 +264,12 @@ public class User extends Father implements Serializable {
 		}
 	}
 	
-	private boolean send(){
-		
-		//TODO find a way to get content and subject		
-		
-		/*
-		mail.setContent(content);
-		mail.setSubject(subject);
-		
-		return mail.send();
-		*/
-		return true;
-	}
-	
 	public void setStatus(Value status){
 		this.status = status;
 	}
 	
 	public List<Log> getLogs(){
 		return this.logs;
-	}
-	
-	public void setMail(Mail mail){
-		
-		if(mail != null){
-			this.mail = mail;
-		}else{
-			addError("user", "user_error_internal");
-		}
 	}
 	
 	public Log addLog(Log log){

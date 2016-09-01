@@ -34,7 +34,7 @@ public class Thankyou extends HttpServlet {
 		if(pathParts.length == 3 && pathParts[2].equals(thankyou)){
 			
 			request.getSession().removeAttribute("thankyou");
-			request.getRequestDispatcher(db.getSetting("jsp_folder") + "thankyou/" + pathParts[2]).forward(request, response);
+			request.getRequestDispatcher(db.getSetting("jsp_folder") + "thankyou/" + pathParts[2] + ".jsp").forward(request, response);
 		}
 		else{
 			response.getWriter().append("Served at: ").append(request.getContextPath()).append("\n")

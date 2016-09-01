@@ -22,7 +22,7 @@
     <url-pattern>/logout</url-pattern>
     <url-pattern>/password</url-pattern>
   </servlet-mapping>
-    <servlet>
+  <servlet>
     <servlet-name>thankyou</servlet-name>
     <servlet-class>com.laetienda.servlets.Thankyou</servlet-class>
   </servlet>

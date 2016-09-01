@@ -13,7 +13,10 @@ import com.laetienda.utilities.Logger;
 import com.laetienda.utilities.DB;
 import com.laetienda.utilities.Auth;
 import com.laetienda.utilities.DbTransaction;
+import com.laetienda.utilities.Mail;
 import com.laetienda.utilities.Mailer;
+import com.laetienda.utilities.Lang;
+import com.laetienda.utilities.CharArrayWriterResponse;
 import com.laetienda.beans.Page;
 
 public class App extends HttpServlet {
@@ -25,6 +28,8 @@ public class App extends HttpServlet {
 	private User user;
 	private Page page;
 	private Mailer mailer;
+	private Lang lang;
+	
        
     public App() {
         super();
@@ -60,7 +65,7 @@ public class App extends HttpServlet {
 		String submit = request.getParameter("submit");
 		
 		if(submit.equals("login")){
-			validateUser(request, response);
+			login(request, response);
 		
 		}else if(submit.equals("signup")){
 			signup(request, response);
@@ -81,10 +86,10 @@ public class App extends HttpServlet {
 		pathParts = (String[])request.getAttribute("pathParts");
 		user = (User)session.getAttribute("user");
 		page = (Page)request.getAttribute("page");
-		
+		lang = (Lang)request.getSession().getAttribute("lang");
 	}
 	
-	private void validateUser(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException{
+	private void login(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException{
 		log.info("validating user");
 		
 		String username = request.getParameter("username");
@@ -95,6 +100,7 @@ public class App extends HttpServlet {
 		
 		if(auth.getErrors().size() > 0){
 			request.setAttribute("auth", auth);
+			doGet(request, response);
 		}else{
 			user = auth.getUser();
 			log.setUser(user);
@@ -113,40 +119,56 @@ public class App extends HttpServlet {
 		String email = request.getParameter("email");
 		String password = request.getParameter("password");
 		String password_confirm = request.getParameter("password_confirm");
+		String language = request.getParameter("language");
 		
 		DbTransaction tran = new DbTransaction(db.getEm(), log);
+		CharArrayWriterResponse emailResponse = new CharArrayWriterResponse(response);
 		
 		User user = new User();
 		user.setLogger(log);
-		user.setUsername(email);
-		user.setPassword(password, password_confirm);
+		Mail mail = mailer.createMail(user, log);
 		
 		try{
 			com.laetienda.entities.App app = tran.getEm().createNamedQuery("App.findByName", com.laetienda.entities.App.class).setParameter("name", "Videos").getSingleResult();
 			app.setLogger(log);
-			user.setMail(mailer.createMail(user, log));
-			app.addUser(user);
+		
+			user.setApp(app);
+			user.setUsername(email);
+			user.setPassword(password, password_confirm);
 			user.setStatus("registered");
+			user.setLanguage(language);
+			lang.setLang(language);
+			response.addCookie(lang.getCookie());
 			
+			mail.setSubject(lang.out("email_signup_subject"));
+			request.setAttribute("emailuser", user);
+			request.getRequestDispatcher(db.getSetting("mail_folder") + "signup.jsp").forward(request, emailResponse);
+			mail.setContent(emailResponse.getOutput());
+			request.removeAttribute("emailuser");
+		
 			if(user.getErrors().size() <= 0){
-				if(!tran.commit()){
-					user.addError("signup", "user_error_internal");
+				
+				if(mail.send() && tran.commit()){
+					log.debug("User has been signed up succesfully");
+				}else{
+					user.addError("user", "user_error_internal");
 				}
 			}
 
 		}catch (Exception ex){
 			user.addError("user", "user_error_internal");
-			log.critical("Application not found");
+			log.error("Error while signing up an user");
 			log.exception(ex);
 		}finally{
 			db.closeEm(tran.getEm());
 			
 			if(user.getErrors().size() > 0){
+				
 				request.setAttribute("user", user);
 				doGet(request, response);
 			}else{
 				request.getSession().setAttribute("thankyou", "signup");
-				response.sendRedirect(page.getUrl() + "thankYou/signup");
+				response.sendRedirect(page.getUrl() + "/thankyou/signup");
 			}
 		}
 	}

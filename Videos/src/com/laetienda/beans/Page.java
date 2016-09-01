@@ -1,10 +1,13 @@
 package com.laetienda.beans;
 
 import java.util.List;
+import java.net.URLDecoder;
+import java.net.URLEncoder;
 import java.util.ArrayList;
+import java.util.Base64;
+
 import javax.servlet.http.HttpServletRequest;
 import com.laetienda.utilities.Logger;
-
 
 public class Page {
 
@@ -84,5 +87,40 @@ public class Page {
 			//TODO validate onload function
 			getOnloads().add(onload);
 		}
+	}
+	
+	public String encode(int original){
+		return encode(Integer.toString(original));
+	}
+	
+	public String encode(String original){
+		String result = new String();
+		
+		try{
+			byte[] encrypted = Base64.getEncoder().encode(original.getBytes());
+			String temp = new String(encrypted);
+			result = URLEncoder.encode(temp, "UTF-8");
+		}catch(Exception ex){
+			log.error("error while encodig string");
+			log.exception(ex);
+		}
+		
+		return result;
+	}
+	
+	public String decode(String encoded){
+		String result = new String();
+		
+		try{
+			String encrypted = URLDecoder.decode(encoded, "UTF-8");
+			
+			byte[] decoded = Base64.getDecoder().decode(encrypted);
+			result = new String(decoded);
+		}catch(Exception ex){
+			log.error("error while decoding string");
+			log.exception(ex);
+		}
+		
+		return result;
 	}
 }

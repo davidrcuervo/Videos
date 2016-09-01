@@ -7,12 +7,12 @@
 				<span class="input-group-addon">
 					<span class="glyphicon glyphicon-envelope" aria-hidden="true"></span>
 				</span>
-				<input type="text" class="form-control" id="login_email" name="username" placeholder="${lang.out('email_address') }">
+				<input type="text" class="form-control" id="login_email" name="username" placeholder="${lang.out('email_address') }" value="${auth.username }">
 			</div>
 			<c:if test="${auth.errors['username'] != null}">
 				<div class="text-danger text-center">
 					<c:forEach var="error" items="${auth.errors['username'] }">
-						<small>${error}</small><br />
+						<small>${lang.out(error) }</small><br />
 					</c:forEach>
 				</div>
 			</c:if>
@@ -28,17 +28,17 @@
 			<c:if test="${auth.errors['password'] != null}">
 				<div class="text-danger text-center">
 					<c:forEach var="error" items="${auth.errors['password'] }">
-						<small>${error}</small><br />
+						<small>${lang.out(error) }</small><br />
 					</c:forEach>
 				</div>
 			</c:if>
 		</div>
 			
-		<button type="submit" class="btn btn-primary btn-lg btn-block"><span class="glyphicon glyphicon-log-in"></span>  ${lang.out('login') }</button>
+		<button type="submit" name="submit" value="login" class="btn btn-primary btn-lg btn-block"><span class="glyphicon glyphicon-log-in"></span>  ${lang.out('login') }</button>
 		<c:if test="${auth.errors['login'] != null}">
 			<div class="text-danger text-center">
 				<c:forEach var="error" items="${auth.errors['login'] }">
-					<small>${error}</small><br />
+					<small>${lang.out(error) }</small><br />
 				</c:forEach>
 			</div>
 		</c:if>

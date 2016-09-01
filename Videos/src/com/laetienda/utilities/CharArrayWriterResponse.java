@@ -20,4 +20,7 @@ public class CharArrayWriterResponse extends HttpServletResponseWrapper{
 		return new PrintWriter(charArray);
 	}
 	
+	public String getOutput(){
+		return charArray.toString();
+	}
 }

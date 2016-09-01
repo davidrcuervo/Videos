@@ -49,13 +49,9 @@ public class App extends Father implements Serializable {
 	private HashMap<String, String> setting;
 
 	//bi-directional many-to-one association to UserGroup
-	@OneToMany(mappedBy="app")
+	@OneToMany(mappedBy="app", cascade=CascadeType.PERSIST)
 	private List<User> users;
-	@Transient
-	private HashMap<String, User> userByUsername;
-	@Transient
-	private HashMap<Integer, User> userById;
-	
+		
 	//bi-directional many-to-one association to UserGroup
 	@OneToMany(mappedBy="app")
 	private List<UserGroup> userGroups;
@@ -217,48 +213,24 @@ public class App extends Father implements Serializable {
 	public User getUser(String username){
 		User result = null;
 		
-		if(this.userByUsername == null){
-			this.userByUsername = new HashMap<String, User>();
-		}
-		
-		User temp = this.userByUsername.get(username);
-		if(temp == null){
-			
-			for(User temp2 : getUsers()){
-				if(temp2.getUsername().equals(username)){
-					result = temp2;
-					this.userByUsername.put(result.getUsername(), result);
-					break;
-				}
+		for(User temp2 : getUsers()){
+			if(temp2.getUsername() != null && temp2.getUsername().equals(username)){
+				result = temp2;
+				break;
 			}
-			
-		}else{
-			result = temp;
 		}
-		
+	
 		return result;
 	}
 	
 	public User getUser(Integer id){
 		User result = null;
 		
-		if(this.userById == null){
-			this.userById = new HashMap<Integer, User>();
-		}
-		
-		User temp = this.userById.get(id);
-		if(temp == null){
-			
-			for(User temp2 : getUsers()){
-				if(temp2.getId().equals(id)){
-					result = temp2;
-					this.userById.put(result.getId(), result);
-					break;
-				}
+		for(User temp : getUsers()){
+			if(temp.getId().equals(id)){
+				result = temp;
+				break;
 			}
-			
-		}else{
-			result = temp;
 		}
 		
 		return result;

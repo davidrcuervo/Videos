@@ -1,6 +1,7 @@
 package com.laetienda.filters;
 
 import java.io.IOException;
+import java.util.HashMap;
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
 import javax.servlet.FilterConfig;
@@ -18,6 +19,7 @@ import com.laetienda.utilities.Lang;
 import com.laetienda.utilities.Auth;
 import com.laetienda.beans.Page;
 
+
 public class App implements Filter {
 	
 	private Logger log;
@@ -27,6 +29,7 @@ public class App implements Filter {
 	private Auth auth;
 	private Lang lang;
 	private Page page;
+	private HashMap<String, Cookie> cookies;
 	
 	
     public App() {
@@ -49,13 +52,15 @@ public class App implements Filter {
 		
 		setLogger(httpReq);
 		findPathParts(httpReq);
+		findCookies(httpReq);
 		setLang(httpReq);
 		setAuth(httpReq, httpResp);
 		
-		page = new Page(httpReq, log); 
+		page = new Page(httpReq, log);
 		
 		httpReq.setAttribute("pathParts", pathParts);
 		httpReq.setAttribute("page", page);
+		httpReq.setAttribute("cookies", cookies);
 
 		// pass the request along the filter chain
 		chain.doFilter(request, response);
@@ -101,6 +106,16 @@ public class App implements Filter {
 			for(int c=0; c < pathParts.length; c++){
 				log.debug("pathParts[" + c + "] = " + pathParts[c]);
 			}
+		}
+	}
+	
+	private void findCookies(HttpServletRequest httpReq) throws IOException, ServletException{
+		log.info("finding cookies");
+		
+		cookies = new HashMap<String, Cookie>();
+		
+		for(Cookie cookie : httpReq.getCookies()){
+			cookies.put(cookie.getName(), cookie);
 		}
 	}
 	
@@ -159,24 +174,11 @@ public class App implements Filter {
 		
 		if(lang == null){
 			lang = new Lang(db.getEm(), db.getUserByUsername("Logger"), log);
-			log.debug("finding language in cookie");
-			
-			boolean flag = true;
-			
-			for(Cookie cookie : httpReq.getCookies()){
-				if(cookie.getName() == "lang"){
-					lang.setTempLang(cookie.getValue());
-					flag = false;
-					break;
-				}
-			}
-			
-			if(flag){
-				log.debug("Language detected by header sent by web explorer. $Accept-Language: " + httpReq.getHeader("Accept-Language"));
-				lang.setTempLang(httpReq.getHeader("Accept-Language"));
-			}
+			lang.setCookie(cookies.get("lang"));
+			//lang.setHeaderLanguage(httpReq.getHeader("Accept-Language"));
+						
+			lang.setCookie(cookies.get("lang"));
+			session.setAttribute("lang", lang);
 		}
-		
-		session.setAttribute("lang", lang);
 	}
 }

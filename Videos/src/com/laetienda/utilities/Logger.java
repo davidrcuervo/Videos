@@ -21,7 +21,7 @@ public class Logger {
 	public static final String DEFAULT_USER = "Logger";
 	public static int counter = 0;
 	
-	private static boolean devMode = false;
+	private static boolean devMode = true;
 	
 	private File file;
 	private int level;
@@ -274,5 +274,9 @@ public class Logger {
 		debug("Exception catched");
 		debug("Exception name: " + ex.getClass().getName());
 		debug("Exception message: " + ex.getMessage());
+		
+		if(Logger.isDevmode()){
+			ex.printStackTrace();
+		}
 	}
 }

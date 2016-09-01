@@ -10,6 +10,7 @@ import com.laetienda.entities.User;
 public class Auth {
 	
 	private User user;
+	private String username;
 	private HashMap<String, List<String>> errors;
 	private EntityManager em;
 	private Logger log;
@@ -18,23 +19,26 @@ public class Auth {
 		
 		this.em = em;
 		this.log = log;
+		this.username = username;
 		log.info("Validationg user. $username: " + username);
 		
 		try{
 			user = getEm().createNamedQuery("User.findByUsername", User.class).setParameter("username", username).getSingleResult();
 		}catch(Exception ex){
-			addError("login", "login_user_not_found");
+			addError("username", "login_user_not_found");
 			log.debug("User not found in database");
 		}
 		
 		if(user != null){
-			if(user.getPassword().equals(password)){
-				log.debug("user has been validated correctly. $username: " + username);
-			}else{
-				addError("login", "login_password_not_match");
+			
+			if(!user.validatePassword(password)){
+				addError("password", "login_password_not_match");
+			}
+			
+			if(user.isValid() != null && !user.isValid().isEmpty()){
+				addError("login", user.isValid());				
 			}
 		}
-		
 	}
 	
 	public EntityManager getEm(){
@@ -43,20 +47,37 @@ public class Auth {
 	
 	private void addError(String name, String error){
 		
-		if(errors.get(name) == null){
-			List<String> temp = new ArrayList<String>();
-			errors.put(name, temp);
+		if(getErrors() == null){
+			this.errors = new HashMap<String, List<String>>();
 		}
 		
-		List<String> temp2 = errors.get(name);
-		temp2.add(error);
+		List<String> errorList = getErrors().get(name);
+		
+		if(errorList == null){
+			errorList = new ArrayList<String>();
+			getErrors().put(name, errorList);
+		}
+		
+		errorList.add(error);
 	}
 	
 	public HashMap<String, List<String>> getErrors(){
-		return this.errors;
+		if(errors == null){
+			errors = new HashMap<String, List<String>>(); 
+		}
+		
+		return errors;
+	}
+	
+	public String getUsername(){
+		return username;
 	}
 	
 	public User getUser(){
 		return this.user;
+	}
+	
+	public String getTest(){
+		return "auth test";
 	}
 }

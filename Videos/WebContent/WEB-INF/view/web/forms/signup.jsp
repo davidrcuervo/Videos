@@ -1,5 +1,6 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <c:set scope="request" var="signup_form">
+	
 	<form method="post">
 		<div class="form-group">
 			<label for="email">${lang.out('email') }:</label>
@@ -7,7 +8,7 @@
 				<span class="input-group-addon">
 					<span class="glyphicon glyphicon-envelope" aria-hidden="true"></span>
 				</span>
-				<input type="text" class="form-control" id="email" name="email" placeholder="${lang.out('email_address') }">
+				<input type="text" class="form-control" id="email" name="email" placeholder="${lang.out('email_address') }" value="${user.username }">
 			</div>
 			<c:if test="${user.errors['username'] != null}">
 				<div class="text-danger text-center">
@@ -42,6 +43,22 @@
 				</span>
 				<input class="form-control" type="password" id="password_confirm" name="password_confirm" placeholder="${lang.out('password_comfirm_placeholder') }">
 			</div>
+		</div>
+		
+		<div class="form-group">
+			<label for="language_select">${lang.out('signup_chose_language') }</label>
+			<select id="language_select" class="form-control" name="language">
+				<option value="no">${lang.out('signup_chose_language') }</option>
+				<option value="en" ${user.language.value == 'en' ? 'selected' : '' }>English</option>
+				<option value="es" ${user.language.value == 'es' ? 'selected' : '' }>Espanol</option>
+			</select>
+			<c:if test="${user.errors['language'] != null}">
+				<div class="text-danger text-center">
+					<c:forEach var="error" items="${user.errors['language'] }">
+						<small>${lang.out(error)}</small><br />
+					</c:forEach>
+				</div>
+			</c:if>
 		</div>
 		
 		<button type="submit" name="submit" value="signup" class="btn btn-primary btn-block">${lang.out('signup_button') }</button>

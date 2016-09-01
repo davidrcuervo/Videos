@@ -10,13 +10,6 @@ public class Mailer {
 	private String password;
 	private int port;
 	
-	//private String subject;
-	//private String content;
-	//private String to;
-	//private Properties mailServerProperties;
-	//private Session getMailSession;
-	//private MimeMessage generateMailMessage;
-	
 	public Mailer(String server, int port, String username, String password, Logger log){
 		this.log = log;
 		

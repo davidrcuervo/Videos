@@ -18,7 +18,7 @@ public class Mail {
 	private int port;
 	private String subject;
 	private String content;
-	private String to;
+	private User user;
 	private Properties mailServerProperties;
 	private Session getMailSession;
 	private MimeMessage generateMailMessage;
@@ -31,7 +31,7 @@ public class Mail {
 		this.port = port;
 		this.username = username;
 		this.password = password;
-		this.to = user.getUsername();
+		this.user = user;
 	}
 	
 	public void setSubject(String subject){
@@ -50,8 +50,8 @@ public class Mail {
 		return this.content;
 	}
 	
-	public String getTo(){
-		return this.to;
+	public User getUser(){
+		return this.user;
 	}
 	
 	public boolean send(){
@@ -61,12 +61,14 @@ public class Mail {
 			mailServerProperties = System.getProperties();
 			mailServerProperties.put("mail.smtp.port", Integer.toString(port));
 			mailServerProperties.put("mail.smtp.auth", "true");
-			mailServerProperties.put("mail.smtp.starttls.enable", "true");
+			//mailServerProperties.put("mail.smtp.starttls.enable", "true");
+			mailServerProperties.put("mail.smtp.ssl.enable", "true");
+			mailServerProperties.put("mail.smtp.ssl.trust", "*");
 			
 			getMailSession = Session.getDefaultInstance(mailServerProperties, null);
 			generateMailMessage = new MimeMessage(getMailSession);
-			
-			generateMailMessage.addRecipient(Message.RecipientType.TO, new InternetAddress(getTo()));
+			log.debug("TO: " + getUser().getUsername());
+			generateMailMessage.addRecipient(Message.RecipientType.TO, new InternetAddress(getUser().getUsername()));
 			generateMailMessage.setSubject(getSubject(), "utf-8");
 			
 			generateMailMessage.setContent(getContent(), "text/html; charset=utf-8");
@@ -79,8 +81,10 @@ public class Mail {
 			result = true;
 			
 		}catch (Exception ex){
-			log.notice("Exception caught while test connection to email server");
+			log.notice("Exception caught while sending email message");
 			log.exception(ex);
+		}finally{
+			
 		}
 		
 		return result;

@@ -27,7 +27,12 @@ public abstract class Father {
 	}
 	
 	public HashMap<String, List<String>> getErrors(){
-		return this.errors;
+		
+		if(errors == null){
+			errors = new HashMap<String, List<String>>(); 
+		}
+		
+		return errors;
 	}
 	
 	public void addError(String name, String error){

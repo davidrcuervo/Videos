@@ -7,7 +7,11 @@ import java.util.List;
 
 @Entity
 @Table(name="variables")
-@NamedQuery(name="Variable.findAll", query="SELECT v FROM Variable v")
+@NamedQueries({
+	@NamedQuery(name="Variable.findAll", query="SELECT v FROM Variable v"),
+	@NamedQuery(name="Variable.findByName", query="SELECT v FROM Variable v WHERE v.name = :name"),
+})
+
 public class Variable extends Father implements Serializable {
 	private static final long serialVersionUID = 1L;
 
