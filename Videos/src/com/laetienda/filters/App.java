@@ -30,6 +30,7 @@ public class App implements Filter {
 	private Lang lang;
 	private Page page;
 	private HashMap<String, Cookie> cookies;
+	private boolean flag;
 	
 	
     public App() {
@@ -45,6 +46,7 @@ public class App implements Filter {
 	 */
 	public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
 		
+		flag = true;
 		HttpServletRequest httpReq = (HttpServletRequest)request;
 		HttpServletResponse httpResp = (HttpServletResponse)response;
 		
@@ -63,7 +65,9 @@ public class App implements Filter {
 		httpReq.setAttribute("cookies", cookies);
 
 		// pass the request along the filter chain
-		chain.doFilter(request, response);
+		if(flag){
+			chain.doFilter(request, response);
+		}
 	}
 
 	/* (non-Javadoc)
@@ -138,6 +142,9 @@ public class App implements Filter {
 		//	/login
 			||  (pathParts.length == 2 && pathParts[1].equals("login") )
 			
+		//	/user/password/confirm
+			||  (pathParts.length == 4 && pathParts[1].equals("user") && pathParts[2].equals("password") && pathParts[3].equals("confirm"))
+			
 		// /thankyou/*
 			|| 	(pathParts.length == 3 && pathParts[1].equals("thankyou"))
 				){
@@ -163,6 +170,7 @@ public class App implements Filter {
 			
 			if(auth == null){
 				String temp = httpReq.getContextPath();
+				flag = false;
 				response.sendRedirect(temp + "/login");
 			}
 		}

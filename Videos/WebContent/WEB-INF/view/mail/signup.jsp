@@ -21,12 +21,11 @@
    <tr><td style="${header1}"><b>${lang.out('email_signup_title')}</b></td></tr>
    <tr><td style="${header5}">${lang.out('email_signup_text') }</td></tr>
    
-   
    <tr><td align="center">
        <table border="0" cellpadding="10" cellspacing="0" width="250" style="margin: 15px 0 0 0">
          <tr>
            <td align="center" style="${btn_td}">
-             <a href="${page.url}/user/password/confirm?id=${page.encode('test') }" style="${btn_a}" target="_blank">${lang.out('email_signup_password_button') }</a>
+             <a href="${page.url}/user/password/confirm?id=${page.encode(emailuser.username)}" style="${btn_a}" target="_blank">${lang.out('email_signup_password_button') }</a>
            </td>
          </tr>
        </table>

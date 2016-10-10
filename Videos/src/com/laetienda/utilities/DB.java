@@ -99,16 +99,18 @@ public class DB {
     	User result = userByUsername.get(username);
     	
     	if(result == null){
+    		
+    		EntityManager em = getEm();
     		try{
-    			EntityManager em = getEm();
     			result = em.createNamedQuery("User.findByUsername", User.class).setParameter("username", username).getSingleResult();
         		userByUsername.put(result.getUsername(), result);
-        		
-        		closeEm(em);
+    
     		}catch(Exception ex){
     			ex.printStackTrace();
     			log.notice("User does not exist yet. $username: " + username);
     			log.exception(ex);
+    		}finally{
+    			closeEm(em);
     		}
     	}
 

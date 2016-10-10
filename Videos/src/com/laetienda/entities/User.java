@@ -99,6 +99,12 @@ public class User extends Father implements Serializable {
 		}
 	}
 	
+	/**
+	 * @param password
+	 * @return boolean <br />
+	 * True if the password is correct. <br />
+	 * False if the password is not correct. <br />
+	 */
 	public boolean validatePassword(String password){
 		String temp = org.apache.catalina.realm.RealmBase.Digest(password, "SHA-256", "utf-8");
 		boolean result = false;
@@ -224,13 +230,19 @@ public class User extends Father implements Serializable {
 	public Value getStatus(){
 		return this.status;
 	}
-	
+	/**
+	 * @param status The enabled status are (valid, disabled and registered). <br />
+	 * <b>valid:</b> The user has validated his credentials and he's able to login. <br />
+	 * <b>disabled:</b> The user exists in the database but has been disabled. <br />
+	 * <b>registered:</b> The user has registered in the database but he has not validated his credentials yet. <br />
+	 * 
+	 */
 	public void setStatus(String status){
 		
 		if(getErrors().size() <= 0){
 			List<Value> values = getApp().getValues("user_status");
 			
-			if(!(values == null)){
+			if(values != null){
 				
 				boolean flag = false;
 				for(Value temp : values){
@@ -242,6 +254,15 @@ public class User extends Father implements Serializable {
 						
 							case "registered":
 								setStatus(temp);
+								break;
+								
+							case "valid":
+								
+								if(this.getStatus().getValue().equals("registered")){
+									setStatus(temp);
+								}else{
+									addError("user", "wrong_previous_user_status_to_validate");
+								}
 								break;
 							
 							default:
