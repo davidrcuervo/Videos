@@ -1,6 +1,7 @@
 package com.laetienda.beans;
 
 import java.util.List;
+import java.util.HashMap;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.util.ArrayList;
@@ -14,12 +15,14 @@ public class Page {
 	private List<String> styles;
 	private List<String> scripts;
 	private List<String> onloads;
+	private HashMap<String, String> tabs;
 	private Logger log;
 	private String url;
 	
 	public Page(HttpServletRequest request, Logger log){
 		styles = new ArrayList<String>();
 		scripts = new ArrayList<String>();
+		tabs = new HashMap<String, String>();
 		this.log = log;
 		
 		buildUrl(request);
@@ -122,5 +125,21 @@ public class Page {
 		}
 		
 		return result;
+	}
+	
+	private HashMap<String, String> getTabs(){
+		return tabs;
+	}
+	
+	public void addTab(String identifier, String value){
+		log.info("Setting active tab. $identifier: " + identifier + ", $value: " + value);
+		
+		getTabs().put(identifier, value);
+	}
+	
+	public String showTab(String identifier){
+		log.info("Getting active tab. $identifier: " + identifier);
+		
+		return getTabs().get(identifier);
 	}
 }

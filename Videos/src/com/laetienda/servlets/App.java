@@ -164,6 +164,7 @@ public class App extends HttpServlet {
 			
 			if(user.getErrors().size() > 0){
 				
+				page.addTab("login", "signup");
 				request.setAttribute("user", user);
 				doGet(request, response);
 			}else{
