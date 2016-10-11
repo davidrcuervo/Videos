@@ -115,6 +115,27 @@ public class User extends Father implements Serializable {
 		
 		return result;
 	}
+	
+	/**
+	 * 
+	 * @param old_password Current password that will be changed
+	 * @param new_password New password
+	 * @param new_passw_confirm Confirm password has to be exact to new password
+	 * @return no return 
+	 * <p>If password is changed successfully the getErrors().size() will be 0</p>.
+	 * <p>Errors will be listed under the keys <b>old_password</b> and <b>password</b></p>
+	 * 
+	 */
+	public void setNewPassword(String old_password, String new_password, String new_passw_confirm){
+				
+		if(this.validatePassword(old_password)){
+			
+			this.setPassword(new_password, new_passw_confirm);
+			
+		}else{
+			this.addError("old_password", "login_password_not_match");
+		}
+	}
 
 	public String getUsername() {
 		return this.username;

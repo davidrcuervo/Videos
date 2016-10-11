@@ -40,8 +40,11 @@ public class User extends HttpServlet {
 		
 		// /user/password/confirm
 		if(pathParts.length == 4 && pathParts[2].equals("password") && pathParts[3].equals("confirm")){
-			
 			doGet_pwdConfirm(request, response);
+			
+		// /user/password
+		}else if(pathParts.length == 3 && pathParts[2].equals("password")){
+			request.getRequestDispatcher(db.getSetting("jsp_folder") + "user/pwdChange.jsp").forward(request, response);
 			
 		// /user/all 
 		}else if(pathParts.length == 3 && pathParts[2].equals("all")){
@@ -62,6 +65,8 @@ public class User extends HttpServlet {
 		
 		if(submit.equals("pwdConfirm")){
 			doPost_pwdConfirm(request, response);
+		}else if(submit.equals("pwdChange")){
+			pwdChange(request, response);
 		}
 		else{
 			log.notice("Bad form submission. $submit: " + submit);
@@ -143,6 +148,43 @@ public class User extends HttpServlet {
 			}else{
 				request.getSession().setAttribute("thankyou", "pwdConfirm");
 				response.sendRedirect(page.getUrl() + "/thankyou/pwdConfirm");
+			}
+			
+		}catch(Exception ex){
+			log.exception(ex);
+			response.sendError(HttpServletResponse.SC_NOT_FOUND);
+		}finally{
+			db.closeEm(tran.getEm());
+		}
+	}
+	
+	private void pwdChange(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		log.info("Changing user password");
+		
+		String old_password = request.getParameter("old_password");
+		String new_password = request.getParameter("new_password");
+		String new_passw_confirm = request.getParameter("new_passw_confirm");
+		com.laetienda.entities.User user = (com.laetienda.entities.User)request.getSession().getAttribute("user");
+		DbTransaction tran = new DbTransaction(db.getEm(), log);
+		
+		try{
+			com.laetienda.entities.User usuario = tran.getEm().find(com.laetienda.entities.User.class, user.getId());
+			usuario.setNewPassword(old_password, new_password, new_passw_confirm);
+			
+			if(usuario.getErrors().size() <= 0){
+				if(tran.commit()){
+					log.info("password has been updated succesfully");
+				}else{
+					usuario.addError("user", "user_error_internal");
+				}
+			}
+			
+			if(usuario.getErrors().size() > 0){
+				request.setAttribute("user", usuario);
+				doGet(request, response);
+			}else{
+				request.getSession().setAttribute("thankyou", "pwdChange");
+				response.sendRedirect(page.getUrl() + "/thankyou/pwdChange");
 			}
 			
 		}catch(Exception ex){

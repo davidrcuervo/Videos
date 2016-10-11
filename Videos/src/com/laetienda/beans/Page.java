@@ -131,6 +131,16 @@ public class Page {
 		return tabs;
 	}
 	
+	/**
+	 * @param identifier It is the key to identify the menu.
+	 * @param value It is the value that identifies the tab or menu that should be active.
+	 * <p><b>OPTIONS:</b></p>
+	 * <ul>
+	 * <li><b>login:</b> login, signup and password.</li>
+	 * <li><b>nav_menu:</b> home, tab1, tab2, settings</li>
+	 * <li><b>settings:</b> password</li>
+	 * </ul>
+	 */
 	public void addTab(String identifier, String value){
 		log.info("Setting active tab. $identifier: " + identifier + ", $value: " + value);
 		

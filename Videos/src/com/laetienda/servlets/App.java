@@ -52,6 +52,15 @@ public class App extends HttpServlet {
 		// /login
 		}if(pathParts.length == 2 && pathParts[1].equals("login")){
 			request.getRequestDispatcher(db.getSetting("jsp_folder") + "login.jsp").forward(request, response);
+		
+		// /logout
+		} else if(pathParts.length == 2 && pathParts[1].equals("logout")){
+			logout(request, response);
+		
+			// /home
+		}else if(pathParts.length == 2 && pathParts[1].equals("home")){
+			request.getRequestDispatcher(db.getSetting("jsp_folder") + "home.jsp").forward(request, response);
+			
 		}
 		else{
 			response.getWriter().append("Served at: ").append(request.getContextPath()).append("\n")
@@ -111,6 +120,17 @@ public class App extends HttpServlet {
 			request.getSession().setAttribute("user", user);
 			response.sendRedirect((String)request.getSession().getAttribute("current_uri"));
 		}
+	}
+	
+	private void logout(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException{
+		log.info("logging out");
+		
+		log.setUser(db.getUserByUsername("Logger"));
+		lang.setUser(db.getUserByUsername("Logger"));
+		request.getSession().removeAttribute("auth");
+		request.getSession().removeAttribute("user");
+		
+		response.sendRedirect(page.getUrl());
 	}
 
 	private void signup(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException{

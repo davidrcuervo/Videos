@@ -1,6 +1,7 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ page language="java" contentType="text/html; charset=UTF-8"
     pageEncoding="UTF-8"%>
+
 <!DOCTYPE html>
 <html lang=${lang.lang }>
 <head>
@@ -26,6 +27,7 @@
 	
 </head>
 <body>
+	${page.showTab('nav_menu')}
 	<nav class="navbar navbar-default">
 	 	<div class="container-fluid">
 	    <!-- Brand and toggle get grouped for better mobile display -->
@@ -42,9 +44,9 @@
 	    <!-- Collect the nav links, forms, and other content for toggling -->
 	    <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
 	      <ul class="nav navbar-nav">
-	        <li class="${active_link == 'event' ? 'active' : ''}"><a href="${pageContext.request.contextPath}/home">Events</a></li>
-	        <li class="${active_link == 'guests' ? 'active' : ''}"><a href="${pageContext.request.contextPath}/guest/all">Guests</a></li>
-	        <li class="${active_link == 'emails' ? 'active' : ''}"><a href="${pageContext.request.contextPath}/email">eMails</a></li>
+	        <li class="${page.showTab('nav_menu') == 'home' ? 'active' : ''}"><a href="${page.url}/home">Home</a></li>
+	        <li class="${page.showTab('nav_menu') == 'Tab1' ? 'active' : ''}"><a href="${page.url}/home">Tab1</a></li>
+ 	        <li class="${page.showTab('nav_menu') == 'Tab2' ? 'active' : ''}"><a href="${page.url}/home">Tab2</a></li>
 	        <li class="dropdown">
 	          <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Dropdown <span class="caret"></span></a>
 	          <ul class="dropdown-menu">
@@ -65,13 +67,15 @@
 	        <button type="submit" class="btn btn-default"><span class="glyphicon glyphicon-search"></span></button>
 	      </form>
 	      <ul class="nav navbar-nav navbar-right">
-	        <li class="dropdown">
+	        <li class="dropdown ${page.showTab('nav_menu') == 'settings' ? 'active' : ''}">
 	          <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"><span class="glyphicon glyphicon-cog"></span></a>
 	          <ul class="dropdown-menu">
-	            <li><a href="#">Action</a></li>
+	            <li><a href="${page.url}/user/edit"><span class="glyphicon glyphicon-user"></span>&nbsp ${lang.out('edit_profile')}</a></li>
+	            <li class="${page.showTab('settings') == 'password' ? 'active' : ''}"><a href="${page.url}/user/password"><span class="glyphicon glyphicon-lock"></span>&nbsp ${lang.out('change_password') }</a></li>
+	            <li><a href="${page.url}/logout"><span class="glyphicon glyphicon-log-out"></span>&nbsp ${lang.out('log_out') }</a></li>
 	            <li role="separator" class="divider"></li>
-	            <li><a href="${pageContext.request.contextPath}/email_server"><span class="glyphicon glyphicon-envelope"></span>&nbsp&nbspeMail Server</a></li>
-	            <li><a href="${pageContext.request.contextPath}/logout"><span class="glyphicon glyphicon-log-out"></span>&nbsp&nbspLog Out</a></li>
+	            <li><a href="${pageContext.request.contextPath}/email_server"><span class="glyphicon glyphicon-cog"></span>&nbsp ${lang.out('app_settings')}</a></li>
+	            
 	          </ul>
 	        </li>
 	      </ul>
